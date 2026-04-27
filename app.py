@@ -40,7 +40,7 @@ uploaded_file = st.file_uploader("Upload dokumen IEC", type=["pdf"])
 if uploaded_file:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        process_btn = st.button("🚀 Jalankan Semua Proses", type="primary", use_container_width=True)
+        process_btn = st.button("🚀 Proses", type="primary", use_container_width=True)
 
     if process_btn:
         base_filename = os.path.splitext(uploaded_file.name)[0]
