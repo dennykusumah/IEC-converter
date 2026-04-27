@@ -21,7 +21,7 @@ st.set_page_config(page_title="IEC/ISO PDF Processor", page_icon="📄", layout=
 
 # ── Inisialisasi Engine ────────────────────────────────────────────────────
 trimmer = PDFTrimmerEngine()
-cleaner = TextCleanerEngine(bg_color=(1, 1, 1)) # (1,1,1) = Warna Putih
+cleaner = TextCleanerEngine(bg_color=(1, 1, 1))
 
 DEFAULT_TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 converter = PDFConverterEngine(tesseract_path=DEFAULT_TESSERACT_PATH)
@@ -31,25 +31,13 @@ if not os.path.exists("temp"):
     os.makedirs("temp")
 
 # ── UI Utama ───────────────────────────────────────────────────────────────
-st.title("📄 IEC/ISO PDF Ultimate Processor")
-st.markdown("""
-Alur kerja otomatis tahap demi tahap:
-1. **✂️ Trim** : Membuang halaman depan & seluruh bagian bahasa Prancis di belakang.
-2. **🧹 Clean** : Menghapus nomor halaman, kode IEC, dan copyright di seluruh halaman.
-3. **🔄 Convert** : Mengubah hasil akhir menjadi file `.docx`.
-""")
+st.title("📄 IEC/ISO PDF Processor")
 
 st.divider()
 
 uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"])
 
 if uploaded_file:
-    file_details = {
-        "Nama File": uploaded_file.name,
-        "Ukuran File (MB)": round(uploaded_file.size / (1024 * 1024), 2)
-    }
-    st.json(file_details)
-
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         process_btn = st.button("🚀 Jalankan Semua Proses", type="primary", use_container_width=True)
@@ -57,64 +45,58 @@ if uploaded_file:
     if process_btn:
         base_filename = os.path.splitext(uploaded_file.name)[0]
         
-        # Definisikan path file sementara untuk setiap tahap
         input_pdf = os.path.join("temp", uploaded_file.name)
         trimmed_pdf = os.path.join("temp", f"{base_filename}_1_trimmed.pdf")
         cleaned_pdf = os.path.join("temp", f"{base_filename}_2_cleaned.pdf")
         output_docx = os.path.join("temp", f"{base_filename}_3_result.docx")
 
-        # Simpan file upload
         with open(input_pdf, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        # Gunakan st.status untuk progress bar yang rapi
-        with st.status("Memproses dokumen...", expanded=True) as status:
+        with st.status("Memproses...", expanded=True) as status:
             
             try:
                 # ── TAHAP 1: TRIMMING ─────────────────────────────────
-                st.write("✂️ **Tahap 1:** Memotong bagian depan & bahasa Prancis...")
+                st.write("✂️ Tahap 1...")
                 success_trim, res_trim, info_trim = trimmer.trim(input_path=input_pdf, output_path=trimmed_pdf)
                 
                 if not success_trim:
-                    st.error(f"Gagal Trim: {res_trim}")
-                    status.update(label="Gagal di Tahap Trim", state="error")
+                    st.error(res_trim)
+                    status.update(label="Gagal", state="error")
                 else:
-                    st.write(f"✔️ Disisakan {info_trim.get('total_trimmed')} halaman utama.")
+                    st.write("✔️ Selesai")
                     
                     # ── TAHAP 2: CLEANING FOOTER ──────────────────────
-                    st.write("🧹 **Tahap 2:** Menghapus nomor halaman & Copyright IEC...")
+                    st.write("🧹 Tahap 2...")
                     success_clean, res_clean, info_clean = cleaner.clean_iec_footer(input_path=trimmed_pdf, output_path=cleaned_pdf)
                     
                     if not success_clean:
-                        st.error(f"Gagal Clean: {res_clean}")
-                        status.update(label="Gagal di Tahap Pembersihan", state="error")
+                        st.error(res_clean)
+                        status.update(label="Gagal", state="error")
                     else:
-                        removed_count = info_clean.get("total_instances_removed", 0)
-                        st.write(f"✔️ Berhasil menghapus {removed_count} elemen teks footer.")
+                        st.write("✔️ Selesai")
                         
                         # ── TAHAP 3: CONVERSION ──────────────────────
-                        st.write("🔄 **Tahap 3:** Mengkonversi ke format Word (.docx)...")
+                        st.write("🔄 Tahap 3...")
                         success_conv, res_conv, mode_conv = converter.convert(cleaned_pdf, output_docx)
                         
                         if not success_conv:
-                            st.error(f"Gagal Convert: {res_conv}")
-                            status.update(label="Gagal di Tahap Konversi", state="error")
+                            st.error(res_conv)
+                            status.update(label="Gagal", state="error")
                         else:
-                            st.write(f"✔️ Konversi selesai (Mode: *{mode_conv}*).")
+                            st.write("✔️ Selesai")
                             
-                            # Simpan hasil akhir ke memori untuk download
                             with open(output_docx, "rb") as f:
                                 st.session_state["docx_bytes"] = f.read()
                                 
                             st.session_state["download_filename"] = f"{base_filename}_RESULT.docx"
-                            status.update(label="✅ Semua Proses Berhasil!", state="complete", expanded=False)
+                            status.update(label="✅ Selesai", state="complete", expanded=False)
                             
             except Exception as e:
-                st.error(f"Terjadi error sistem: {e}")
-                status.update(label="Error Sistem", state="error")
+                st.error(str(e))
+                status.update(label="Error", state="error")
                 
             finally:
-                # Bersihkan semua file temporary dari disk
                 for path in [input_pdf, trimmed_pdf, cleaned_pdf, output_docx]:
                     try:
                         if path and os.path.exists(path): os.remove(path)
@@ -124,11 +106,9 @@ if uploaded_file:
 # ── Panel Download ─────────────────────────────────────────────────────────
 if "docx_bytes" in st.session_state:
     st.divider()
-    st.subheader("📥 Download Hasil Akhir")
-    st.success("File .docx sudah benar-benar bersih. Tidak ada teks bahasa Prancis, tidak ada footer IEC. Siap diterjemahkan!")
     
     st.download_button(
-        label="⬇️ Download File .DOCX",
+        label="⬇️ Download .DOCX",
         data=st.session_state["docx_bytes"],
         file_name=st.session_state["download_filename"],
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
