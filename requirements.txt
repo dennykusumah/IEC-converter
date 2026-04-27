@@ -1,0 +1,14 @@
+# Konversi PDF ke DOCX
+# pdfminer.six sudah terinstall otomatis sebagai dependency pdf2docx
+pdf2docx==0.5.6
+
+# Manipulasi DOCX
+python-docx>=0.8.11
+
+# Streamlit UI
+streamlit>=1.25.0
+
+# OCR – opsional, hanya untuk PDF scan
+# Install Tesseract OCR terlebih dahulu: https://github.com/UB-Mannheim/tesseract/wiki
+pytesseract>=0.3.10
+Pillow>=10.0.0
