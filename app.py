@@ -17,7 +17,7 @@ from engine13 import PDFConverterEngine
 logging.basicConfig(level=logging.INFO)
 
 # ── Konfigurasi Halaman ────────────────────────────────────────────────────
-st.set_page_config(page_title="IEC to ISO Converter", page_icon="📄", layout="centered")
+st.set_page_config(page_title="IEC/ISO PDF Processor", page_icon="📄", layout="centered")
 
 # ── Inisialisasi Engine ────────────────────────────────────────────────────
 trimmer = PDFTrimmerEngine()
@@ -37,6 +37,13 @@ st.markdown(
 )
 
 st.divider()
+
+# ── Tombol Remove Watermark ───────────────────────────────────────────────
+st.link_button(
+    label="💧 Remove Watermark", 
+    url="https://lightpdf.com/remove-watermark", 
+    use_container_width=True
+)
 
 uploaded_file = st.file_uploader("Upload Dokumen IEC", type=["pdf"])
 
