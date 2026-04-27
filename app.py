@@ -31,7 +31,7 @@ if not os.path.exists("temp"):
     os.makedirs("temp")
 
 # ── UI Utama ───────────────────────────────────────────────────────────────
-st.title("📄 IEC/ISO PDF Processor")
+st.title("IEC to ISO Converter")
 
 st.divider()
 
