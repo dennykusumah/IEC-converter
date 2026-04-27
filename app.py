@@ -1,3 +1,4 @@
+"""
 app.py – IEC/ISO PDF Ultimate Processor
 Alur:
   1. Trim PDF (engine11.py) -> Potong bahasa Prancis
@@ -47,10 +48,9 @@ st.link_button(
 uploaded_file = st.file_uploader("Upload Dokumen IEC", type=["pdf"])
 
 if uploaded_file:
-    # [MODIFIKASI] Menghapus layout kolom agar tombol Proses memenuhi lebar penuh
-    # Kode lama: col1, col2, col3 = st.columns([1, 2, 1])
-    # Kode lama: with col2:
-    process_btn = st.button("🚀 Proses", type="primary", use_container_width=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        process_btn = st.button("🚀 Proses", type="primary", use_container_width=True)
 
     if process_btn:
         base_filename = os.path.splitext(uploaded_file.name)[0]
