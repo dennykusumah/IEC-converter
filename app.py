@@ -17,7 +17,7 @@ from engine13 import PDFConverterEngine
 logging.basicConfig(level=logging.INFO)
 
 # ── Konfigurasi Halaman ────────────────────────────────────────────────────
-st.set_page_config(page_title="IEC to ISO Converter", page_icon="📄", layout="centered")
+st.set_page_config(page_title="IEC/ISO PDF Processor", page_icon="📄", layout="centered")
 
 # ── Inisialisasi Engine ────────────────────────────────────────────────────
 trimmer = PDFTrimmerEngine()
@@ -31,16 +31,16 @@ if not os.path.exists("temp"):
     os.makedirs("temp")
 
 # ── UI Utama ───────────────────────────────────────────────────────────────
-st.title("IEC to ISO Converter")
+st.title("📄 IEC/ISO PDF Processor")
 
 st.divider()
 
-uploaded_file = st.file_uploader("Upload dokumen IEC", type=["pdf"])
+uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"])
 
 if uploaded_file:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        process_btn = st.button("🚀 Proses", type="primary", use_container_width=True)
+        process_btn = st.button("🚀 Jalankan Semua Proses", type="primary", use_container_width=True)
 
     if process_btn:
         base_filename = os.path.splitext(uploaded_file.name)[0]
@@ -53,44 +53,35 @@ if uploaded_file:
         with open(input_pdf, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        with st.status("Memproses...", expanded=True) as status:
+        with st.status("Memproses...", expanded=False) as status:
             
             try:
-                # ── TAHAP 1: TRIMMING ─────────────────────────────────
-                st.write("✂️ Tahap 1...")
+                status.update(label="Tahap 1/3...")
                 success_trim, res_trim, info_trim = trimmer.trim(input_path=input_pdf, output_path=trimmed_pdf)
                 
                 if not success_trim:
                     st.error(res_trim)
                     status.update(label="Gagal", state="error")
                 else:
-                    st.write("✔️ Selesai")
-                    
-                    # ── TAHAP 2: CLEANING FOOTER ──────────────────────
-                    st.write("🧹 Tahap 2...")
+                    status.update(label="Tahap 2/3...")
                     success_clean, res_clean, info_clean = cleaner.clean_iec_footer(input_path=trimmed_pdf, output_path=cleaned_pdf)
                     
                     if not success_clean:
                         st.error(res_clean)
                         status.update(label="Gagal", state="error")
                     else:
-                        st.write("✔️ Selesai")
-                        
-                        # ── TAHAP 3: CONVERSION ──────────────────────
-                        st.write("🔄 Tahap 3...")
+                        status.update(label="Tahap 3/3...")
                         success_conv, res_conv, mode_conv = converter.convert(cleaned_pdf, output_docx)
                         
                         if not success_conv:
                             st.error(res_conv)
                             status.update(label="Gagal", state="error")
                         else:
-                            st.write("✔️ Selesai")
-                            
                             with open(output_docx, "rb") as f:
                                 st.session_state["docx_bytes"] = f.read()
                                 
                             st.session_state["download_filename"] = f"{base_filename}_RESULT.docx"
-                            status.update(label="✅ Selesai", state="complete", expanded=False)
+                            status.update(label="✅ Selesai", state="complete")
                             
             except Exception as e:
                 st.error(str(e))
