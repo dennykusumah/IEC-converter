@@ -35,7 +35,7 @@ st.title("📄 IEC/ISO PDF Processor")
 
 st.divider()
 
-uploaded_file = st.file_uploader("Pilih file PDF", type=["pdf"])
+uploaded_file = st.file_uploader("Upload dokumen IEC", type=["pdf"])
 
 if uploaded_file:
     col1, col2, col3 = st.columns([1, 2, 1])
