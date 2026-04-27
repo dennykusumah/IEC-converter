@@ -31,7 +31,10 @@ if not os.path.exists("temp"):
     os.makedirs("temp")
 
 # ── UI Utama ───────────────────────────────────────────────────────────────
-st.title("IEC to ISO Converter")
+st.markdown(
+    "<h1 style='text-align: center;'>IEC to ISO Converter</h1>",
+    unsafe_allow_html=True
+)
 
 st.divider()
 
