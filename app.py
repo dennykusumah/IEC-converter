@@ -40,8 +40,8 @@ st.divider()
 
 # ── Tombol Remove Watermark ───────────────────────────────────────────────
 st.link_button(
-    label="💧 Remove Watermark", 
-    url="https://lightpdf.com/remove-watermark", 
+    label="📘 Generator RSNI", 
+    url="https://generator-rsni.streamlit.app", 
     use_container_width=True
 )
 
